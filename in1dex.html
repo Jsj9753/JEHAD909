@@ -1,0 +1,170 @@
+<!DOCTYPE html><html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ملفي الشخصي</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f0f8ff;
+        }
+        .info {
+            margin-top: 30px;
+        }
+        .whatsapp-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #25D366;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .whatsapp-button:hover {
+            background-color: #1ebe5d;
+        }
+        canvas {
+            background: #000;
+            display: block;
+            margin: 20px auto;
+            border: 2px solid #333;
+            width: 90%;
+            max-width: 400px;
+            height: 500px;
+        }
+        .controls {
+            margin-top: 20px;
+        }
+        .controls button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 18px;
+            border-radius: 8px;
+            border: none;
+            background-color: #333;
+            color: white;
+            transition: background-color 0.3s ease;
+        }
+        .controls button:hover {
+            background-color: #555;
+        }
+        .note {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <div class="info">
+        <h1>جهاد البلوي</h1>
+        <p>العمر: 17 سنة</p>
+        <p>الأنمي المفضل: ون بيس</p>
+        <p>أفضل مانجا: فينلاند ساغا</p>
+        <a class="whatsapp-button" href="https://wa.me/966530696153" target="_blank">تواصل معي على واتساب</a>
+    </div><h2>لعبة الثعبان البسيطة</h2>
+<div class="note">ملاحظة: أزرار التحكم موجودة تحت اللعبة</div>
+
+<canvas id="game" width="400" height="600"></canvas>
+
+<div class="controls">
+    <div>
+        <button onclick="move('up')">فوق</button>
+    </div>
+    <div>
+        <button onclick="move('left')">يسار</button>
+        <button onclick="move('down')">تحت</button>
+        <button onclick="move('right')">يمين</button>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    const grid = 20;
+    let count = 0;
+    let snake = { x: 160, y: 160, dx: grid, dy: 0, cells: [], maxCells: 4 };
+    let apple = { x: 320, y: 320 };
+
+    function getRandomInt(min, max) {
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+
+    function loop() {
+        requestAnimationFrame(loop);
+        if (++count < 4) return;
+        count = 0;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        snake.x += snake.dx;
+        snake.y += snake.dy;
+
+        if (snake.x < 0) snake.x = canvas.width - grid;
+        else if (snake.x >= canvas.width) snake.x = 0;
+        if (snake.y < 0) snake.y = canvas.height - grid;
+        else if (snake.y >= canvas.height) snake.y = 0;
+
+        snake.cells.unshift({ x: snake.x, y: snake.y });
+        if (snake.cells.length > snake.maxCells) snake.cells.pop();
+
+        ctx.fillStyle = "red";
+        ctx.fillRect(apple.x, apple.y, grid - 1, grid - 1);
+
+        ctx.fillStyle = "lime";
+        snake.cells.forEach(function(cell, index) {
+            ctx.fillRect(cell.x, cell.y, grid - 1, grid - 1);
+
+            if (cell.x === apple.x && cell.y === apple.y) {
+                snake.maxCells++;
+                apple.x = getRandomInt(0, canvas.width / grid) * grid;
+                apple.y = getRandomInt(0, canvas.height / grid) * grid;
+            }
+
+            for (let i = index + 1; i < snake.cells.length; i++) {
+                if (cell.x === snake.cells[i].x && cell.y === snake.cells[i].y) {
+                    snake.x = 160;
+                    snake.y = 160;
+                    snake.cells = [];
+                    snake.maxCells = 4;
+                    snake.dx = grid;
+                    snake.dy = 0;
+                    apple.x = getRandomInt(0, canvas.width / grid) * grid;
+                    apple.y = getRandomInt(0, canvas.height / grid) * grid;
+                }
+            }
+        });
+    }
+
+    function move(direction) {
+        if (direction === 'left' && snake.dx === 0) {
+            snake.dx = -grid;
+            snake.dy = 0;
+        } else if (direction === 'up' && snake.dy === 0) {
+            snake.dy = -grid;
+            snake.dx = 0;
+        } else if (direction === 'right' && snake.dx === 0) {
+            snake.dx = grid;
+            snake.dy = 0;
+        } else if (direction === 'down' && snake.dy === 0) {
+            snake.dy = grid;
+            snake.dx = 0;
+        }
+    }
+
+    document.addEventListener("keydown", function(e) {
+        if (e.which === 37) move('left');
+        else if (e.which === 38) move('up');
+        else if (e.which === 39) move('right');
+        else if (e.which === 40) move('down');
+    });
+
+    requestAnimationFrame(loop);
+</script>
+
+</body>
+</html>
